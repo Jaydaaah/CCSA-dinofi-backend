@@ -5,7 +5,9 @@
         "baseUrl": "src",
         "outDir": "dist",
         "sourceMap": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "importHelpers": true,
+        "rootDir": "./src"
     },
     "include": ["src/**/*"]
 }
