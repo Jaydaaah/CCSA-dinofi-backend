@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 import MainRoute from "./routers/mainRoute";
+import { rateLimit } from "express-rate-limit";
 
 const app = express();
 app.use(compression());

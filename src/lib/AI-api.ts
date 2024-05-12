@@ -2,7 +2,6 @@ import axios from "axios";
 import { Message, addMsgtoChatData, toMessage } from "../db/Chat";
 
 const AI_PORT = 8000;
-const AI_ID = "99991856-0247-11ef-b6e6-902b340f0333";
 
 interface BOTRESPONSE {
     botname: string;

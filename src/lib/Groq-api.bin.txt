@@ -1,0 +1,40 @@
+export const GrogPrompt = async (prompt: string) => {
+    // const { messages, model, max_tokens } = createGroqPromptParams(prompt);
+    // const params: ChatCompletionCreateParamsNonStreaming = {
+    //     messages,
+    //     model,
+    //     max_tokens,
+    // };
+    // const chatcomplete = groq.chat.completions.create(params);
+    // const { response, data } = await chatcomplete.withResponse();
+    // if (response.ok) {
+    //     return (await chatcomplete).choices[0].message.content;
+    // }
+    // return null;
+};
+
+export async function* GrogStreamPrompt(prompt: string) {
+    // const { messages, model, max_tokens } = createGroqPromptParams(
+    //     prompt,
+    //     "llama",
+    //     "about"
+    // );
+    // const params: ChatCompletionCreateParamsStreaming = {
+    //     messages,
+    //     model,
+    //     stream: true,
+    //     max_tokens,
+    // };
+    // const chatcomplete = groq.chat.completions.create(params);
+    // const { response, data } = await chatcomplete.withResponse();
+    // if (response.ok) {
+    //     const reader = data.toReadableStream().getReader();
+    //     while (true) {
+    //         const { value, done } = await reader.read();
+    //         if (done) break;
+    //         const jsonString = Buffer.from(value).toString("utf8");
+    //         const parsedData: ChatCompletionChunk = JSON.parse(jsonString);
+    //         yield parsedData.choices[0].delta.content || "";
+    //     }
+    // }
+}
