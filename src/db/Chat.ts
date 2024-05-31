@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { isValidObjectId, model, Schema, Types } from "mongoose";
 
 export interface Message {
     text: string;
@@ -8,7 +8,7 @@ export interface Message {
 
 const emptyMessages: Message[] = [];
 
-const toMessage = (text: string, isright: boolean) => {
+export const toMessage = (text: string, isright: boolean) => {
     const new_msg: Message = {
         text,
         isright,
@@ -37,33 +37,36 @@ const ChatSchema = new Schema<Chat>({
 
 const ChatModel = model("Chat", ChatSchema);
 
-const createChatData = async (nickname: string, prefix: string = "") => {
-    return new ChatModel({
+export async function createChatData(nickname: string, prefix: string = "") {
+    return await ChatModel.create({
         prefix,
         nickname,
         data: [],
-    }).save();
-};
+    });
+}
 
-const getChatData = (_id: string) => ChatModel.findById(_id);
+export async function getChatData(_id: string) {
+    if (isValidObjectId(_id)) {
+        return await ChatModel.findById(_id);
+    } else {
+        return null;
+    }
+}
 
-const deleteChatData = (_id: string) => ChatModel.findByIdAndDelete(_id);
+export async function deleteChatData(_id: string) {
+    if (isValidObjectId(_id)) {
+        return await ChatModel.findByIdAndDelete(_id);
+    } else {
+        return null;
+    }
+}
 
-const addMsgtoChatData = async (_id: string, msg: Message) => {
+export async function addMsgtoChatData(_id: string, msg: Message) {
     const chat = await getChatData(_id);
     if (chat) {
         chat.data.push(msg);
-        chat.save();
+        await chat.save();
     } else {
         console.error(`ID doesn't exists: ${_id}`);
     }
-};
-
-export {
-    createChatData,
-    addMsgtoChatData,
-    deleteChatData,
-    emptyMessages,
-    getChatData,
-    toMessage,
-};
+}

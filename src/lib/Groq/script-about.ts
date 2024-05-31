@@ -70,5 +70,3 @@ important: please do not change Mission, Vision, Goals, and Core Values
 
 ---
 `;
-
-export default role_script;

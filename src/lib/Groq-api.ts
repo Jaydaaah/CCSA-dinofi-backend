@@ -1,17 +1,19 @@
 import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import role_script from "./Groq/script-about";
 import { RateLimitError, APIConnectionTimeoutError } from "groq-sdk";
+import { chatbotRole } from "./Groq/Chatbot-role";
+import { RagRetrieve } from "./RAG-api";
 
 const model = new ChatGroq({
     apiKey: "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",
-    maxTokens: 512,
+    maxTokens: 256,
     model: "llama3-8b-8192",
 });
 
 const template = ChatPromptTemplate.fromMessages([
-    ["system", role_script],
+    ["system", chatbotRole],
+    ["system", `Context:\n{context}\n`],
     ["human", "{prompt}"],
 ]);
 const outputParser = new StringOutputParser();
@@ -29,8 +31,12 @@ async function sleep(ms: number) {
 }
 
 export async function* GrogStreamPrompt(prompt: string) {
+    const context = await RagRetrieve(prompt).then((context) => {
+        return context.join("\n\n");
+    });
     try {
         const response = await chain.stream({
+            context,
             prompt,
         });
         for await (const item of response) {

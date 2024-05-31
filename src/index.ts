@@ -6,7 +6,13 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 import MainRoute from "./routers/mainRoute";
-import { rateLimit } from "express-rate-limit";
+import { Logger } from "./debug/log";
+
+const Log = Logger("Main");
+
+console.log();
+Log("Starting...");
+
 
 const app = express();
 app.use(compression());
@@ -18,22 +24,19 @@ app.use(
     })
 );
 
-app.post("/test", (req: Request, res: Response) => {
-    console.log(req.body);
-    res.status(200).json(req.body);
-});
-
 const server = http.createServer(app);
-
-server.listen(8080, () => {
-    console.log("Server running on http://localhost:8080/");
-});
 
 const MONGO_URL =
     "mongodb+srv://user:9xLY1kxogNt7uAq2@cluster0.ny3tbsu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
+Log("Establishing MongoDB Connection...", "Yellow");
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
 mongoose.connection.on("error", (error: Error) => console.log(error));
+Log("Connection Success", "Green");
+
+server.listen(8080, () => {
+    Log("Server is running on \x1b[36m http://localhost:8080/ \x1b[0m");
+});
 
 app.use(MainRoute());
