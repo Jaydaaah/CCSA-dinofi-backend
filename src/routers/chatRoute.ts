@@ -1,8 +1,8 @@
 import { Router } from "express";
 import AuthenticationMiddleware from "../middlewares/authentication";
-import ClientPrompt from "../controllers/Prompt";
-import RetrieveData from "../controllers/RetrieveData";
-import DeleteData from "../controllers/DeleteData";
+import ClientPrompt from "../controllers/chat/Prompt";
+import RetrieveData from "../controllers/chat/RetrieveData";
+import DeleteData from "../controllers/chat/DeleteData";
 
 const authRouter = (router: Router) => {
     // required user_id as query

@@ -1,4 +1,4 @@
-import { createChatData, getChatData } from "../db/Chat";
+import { getChatData } from "../db/Chat";
 import { Request, Response, NextFunction } from "express";
 import { merge } from "lodash";
 import { Logger } from "../debug/log";
@@ -10,24 +10,24 @@ const AuthenticationMiddleware = async (
     res: Response,
     next: NextFunction
 ) => {
-    const user_id = req.query["user_id"]?.toString();
+    const chat_id = req.query["chat_id"]?.toString();
 
-    if (!user_id) {
-        const msg = "Please Provide user_id as url query";
+    if (!chat_id) {
+        const msg = "Please Provide chat_id as url query";
         console.log();
         log(msg, "Red");
         return res.status(403).send(msg).end();
     }
 
-    const existingChat = await getChatData(user_id);
+    const existingChat = await getChatData(chat_id);
     if (!existingChat) {
-        const msg = `Existing chat not found with user_id: ${user_id}`;
+        const msg = `Existing chat not found with chat_id: ${chat_id}`;
         console.log();
         log(msg, "Red");
         return res.status(401).send(msg).end();
     }
 
-    const { prefix, nickname } = existingChat;
+    const { nickname } = existingChat;
     if (!nickname) {
         const msg = "please re-register again. nickname is missing";
         console.log();
@@ -37,7 +37,7 @@ const AuthenticationMiddleware = async (
         });
     }
 
-    merge(req.body, { user_id, prefix, nickname });
+    merge(req.body, { chat_id, nickname });
 
     return next();
 };

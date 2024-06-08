@@ -1,3 +1,4 @@
 @echo off
-color 2f
-npm run start
+title "Dinofi Backend Server running (Do not Close!)"
+
+npm run dev

@@ -1,29 +1,62 @@
 import { ChatGroq } from "@langchain/groq";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { RateLimitError, APIConnectionTimeoutError } from "groq-sdk";
-import { chatbotRole } from "./Groq/Chatbot-role";
+import { MainTemplate, TitleCreatorTemplate } from "./Groq/Chatbot-role";
 import { RagRetrieve } from "./RAG-api";
 
-const model = new ChatGroq({
+const modelLlama8b = new ChatGroq({
     apiKey: "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",
     maxTokens: 256,
     model: "llama3-8b-8192",
 });
 
-const template = ChatPromptTemplate.fromMessages([
-    ["system", chatbotRole],
-    ["system", `Context:\n{context}\n`],
-    ["human", "{prompt}"],
-]);
+const modelGemma = new ChatGroq({
+    apiKey: "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",
+    maxTokens: 256,
+    model: "gemma-7b-it",
+});
+
 const outputParser = new StringOutputParser();
-const chain = template.pipe(model).pipe(outputParser);
+const mainChain = MainTemplate.pipe(modelLlama8b).pipe(outputParser);
+
+const titleSuggestChain =
+    TitleCreatorTemplate.pipe(modelGemma).pipe(outputParser);
+
+export async function GroqSuggestTitle(prompt: string) {
+    try {
+        const response = await titleSuggestChain.invoke({
+            prompt,
+        });
+        return response.replace(/[^a-zA-Z0-9 ?]/g, '');
+    } catch (error) {
+        return prompt.split(" ").slice(0, 5).join(" ");
+    }
+}
+
+function ErrorCatcher(error: any) {
+    let message: string = `Something went wrong Error: ${error}`;
+    if (error instanceof RateLimitError) {
+        message = "Rate Limit Reached: Please Try again after a minute";
+    } else if (error instanceof APIConnectionTimeoutError) {
+        message = "APIConnectionTimeoutError: Please try again in few seconds";
+    }
+    return message;
+}
 
 export const GroqPrompt = async (prompt: string) => {
-    const response = await chain.invoke({
-        prompt,
+    const context = await RagRetrieve(prompt).then((context) => {
+        return context.join("\n\n");
     });
-    return response;
+    try {
+        const response = await mainChain.invoke({
+            context,
+            prompt,
+        });
+        return response;
+    } catch (error) {
+        let message = ErrorCatcher(error);
+        return message;
+    }
 };
 
 async function sleep(ms: number) {
@@ -35,7 +68,7 @@ export async function* GrogStreamPrompt(prompt: string) {
         return context.join("\n\n");
     });
     try {
-        const response = await chain.stream({
+        const response = await mainChain.stream({
             context,
             prompt,
         });
@@ -44,13 +77,7 @@ export async function* GrogStreamPrompt(prompt: string) {
             yield item;
         }
     } catch (error) {
-        let message: string = `Something went wrong Error: ${error}`;
-        if (error instanceof RateLimitError) {
-            message = "Rate Limit Reached: Please Try again after a minute";
-        } else if (error instanceof APIConnectionTimeoutError) {
-            message =
-                "APIConnectionTimeoutError: Please try again in few seconds";
-        }
+        let message = ErrorCatcher(error);
         for (var chunk of message.split(" ")) {
             yield chunk + " ";
         }

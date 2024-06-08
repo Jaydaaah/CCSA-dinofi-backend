@@ -1,11 +1,16 @@
 import AuthenticationMiddleware from "../middlewares/authentication";
-import Register from "../controllers/Register";
+import RetrieveUser from "../controllers/user/Register";
 import { Router } from "express";
-import IsLogin from "../controllers/IsLogin";
+import CreateChat from "../controllers/user/CreateChat";
+import DeleteUserData from "../controllers/user/DeleteUserData";
+import QuickAskControl from "../controllers/quick/QuickAskControl";
 
 const regRouter = (router: Router) => {
-    router.post("/register", Register);
-    router.get("/logged", IsLogin);
+    router.get("/reg", RetrieveUser);
+    router.post("/reg", CreateChat);
+    router.delete("/reg", DeleteUserData);
+
+    router.put("/quick", QuickAskControl);
 
     return router;
 };
