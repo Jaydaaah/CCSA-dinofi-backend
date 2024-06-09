@@ -60,13 +60,25 @@ export async function deleteChatData(_id: any) {
 }
 
 export async function addMsgtoChatData(_id: any, msg: Message) {
-    const chat = await getChatData(_id);
-    if (chat) {
-        chat.data.push(msg);
-        await chat.save();
-        return true
-    } else {
-        console.error(`ID doesn't exists: ${_id}`);
-        return false;
+    if (isValidObjectId(_id)) {
+        const chat = await getChatData(_id);
+        if (chat) {
+            chat.data.push(msg);
+            await chat.save();
+            return true;
+        }
     }
+    console.error(`ID doesn't exists: ${_id}`);
+    return false;
+}
+
+export async function retrieveLastUserPrompts(_id: any, count: number = 3) {
+    if (isValidObjectId(_id)) {
+        const chat = await ChatModel.findById(_id).select(`data`);
+        if (chat && chat.data.length > 0) {
+            const filtered_data = chat.data;
+            return filtered_data.slice(Math.max(filtered_data.length - count, 0));
+        }
+    }
+    return [];
 }

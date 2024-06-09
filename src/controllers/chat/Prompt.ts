@@ -33,7 +33,7 @@ export default async function ClientPrompt(req: Request, res: Response) {
         await addMsgtoChatData(chat_id, client_msg);
 
         log("Groq Streaming Prompt started", "Blue");
-        for await (var chunk of GrogStreamPrompt(prompt)) {
+        for await (var chunk of GrogStreamPrompt(prompt, chat_data)) {
             res.write(chunk);
             grogStream += chunk;
         }
